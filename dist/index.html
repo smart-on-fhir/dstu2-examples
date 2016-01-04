@@ -31,9 +31,10 @@
 	<script src="./vendor/jquery-2.1.4.min.js"></script>
   <script>
 
-    function getBaseUrl() {
-      return window.location.protocol + 
-        "//" + window.location.host + "/";
+    function getBaseUrl() {      
+      return window.location.protocol + "//" + 
+        window.location.host +
+        window.location.pathname.replace("index.html", "");
     }
 
     function getEditorUrl() {
@@ -88,6 +89,7 @@
 
     $( function() {
       var baseUrl = getBaseUrl();
+      console.log(baseUrl);
       var editorUrl = getEditorUrl();
       $.get("./examples-by-resource.json", function(data) {
         var html = $.map(data, function(resource) {
