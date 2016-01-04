@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="icon" href="./favicon.ico">
+
+    <title>FHIR Example Resources</title>
+
+    <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="./vendor/font-awesome/css/font-awesome.min.css"> -->
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+<body>
+	<div class="container">
+    <h1>FHIR Examples</h1>
+    <div id="content">
+      <div style="text-align:center;margin:20px;">
+        <img src="./ajax-loader.gif" />
+      </div>
+    </div>
+  </div>
+  
+	<script src="./vendor/jquery-2.1.4.min.js"></script>
+  <script>
+
+    function getBaseUrl() {
+      return window.location.protocol + 
+        "//" + window.location.host + "/";
+    }
+
+    function getEditorUrl() {
+      var editorUrl = null;
+      var qs = window.location.search.substr(1);
+      var editorMatches = qs.match(/editorurl=([^&]+)/);
+      if (editorMatches && editorMatches[1])
+        editorUrl = decodeURIComponent(editorMatches[1]);
+      return editorUrl;
+    }
+
+    function unCamel(text) {
+      var words = text.split(/(?=[A-Z])/)
+      capWords = $.map(words, function(word) {
+        return(word[0].toUpperCase() + word.slice(1));
+      });
+      return capWords.join(" ");
+    }
+
+    function buildExampleHtml(fileName, resourceName, baseUrl, editorUrl) {
+      var label = fileName
+        .replace(".canonical.json", "")
+        .replace(/^[^-]+/, resourceName.toLowerCase())
+        .replace(/\-/g, " ");
+
+      var url = "examples/" + fileName;
+      
+      if (editorUrl)
+        url = editorUrl + "?resource=" + 
+          encodeURIComponent(baseUrl + "/" + url);
+      
+      return (
+        "<li><a" +
+        " href='" + url + "'" +
+        " target='_blank'>" + label + "</a></li>"
+      );
+    }
+
+    function buildResourceHtml(resource, baseUrl, editorUrl) {
+        var label = unCamel(resource.name);
+        var examples = $.map(resource.examples, function(fileName) {
+          return buildExampleHtml(fileName, label, baseUrl, editorUrl);
+        });
+        return (
+          "<div class='col-sm-12'>" +
+            "<a id='" + resource.name.toLowerCase() + "'></a>" +
+            "<h4>" + label + "</h4>" +
+            "<ul>" + examples.join("") + "</ul>" +
+          "</div>"
+        );   
+    }
+
+    $( function() {
+      var baseUrl = getBaseUrl();
+      var editorUrl = getEditorUrl();
+      $.get("./examples-by-resource.json", function(data) {
+        var html = $.map(data, function(resource) {
+          return buildResourceHtml(resource, baseUrl, editorUrl);
+        });
+        $("#content").html(html.join(""));
+      });
+    });
+  </script>
+</div></body>
+</html>
+
+
+
+
+
